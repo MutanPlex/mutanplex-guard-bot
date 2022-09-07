@@ -1,5 +1,6 @@
-const { Client, GatewayIntentBits, Partials } = require("discord.js");
+const { Client, GatewayIntentBits, Partials, REST, Routes } = require("discord.js");
 const config = require("./config.js");
+const rest = new REST({ version: "10" }).setToken(config.token);
 
 const client = new Client({
   partials: [
@@ -30,11 +31,41 @@ const client = new Client({
     GatewayIntentBits.MessageContent, // enable if you need message content things
   ],
 });
-
 module.exports = client;
 
 require("./events/message.js")
 require("./events/ready.js")
+
+// SLASH COMMAND DESCRIPTIONS
+const slashCommands = [
+  {
+    name: "test",
+    description: "test command",
+  }
+];
+
+// REGISTER SLASH COMMANDS
+(async () => {
+  try {
+    console.log('Started refreshing application (/) commands.');
+
+    await rest.put(Routes.applicationCommands(config.clientid), { body: slashCommands });
+
+    console.log('Successfully reloaded application (/) commands.');
+  } catch (error) {
+    console.error(error);
+  }
+})();
+
+// SLASH COMMAND RETURN
+client.on('interactionCreate', async interaction => {
+  if (!interaction.isChatInputCommand()) return;
+
+  if (interaction.commandName === 'test') {
+    await interaction.reply('Running test command!');
+  }
+
+});
 
 client.login(config.token).catch(e => {
   console.log("The Bot Token You Entered Into Your Project Is Incorrect Or Your Bot's INTENTS Are OFF!")
