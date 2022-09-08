@@ -10,7 +10,7 @@ client.on("messageCreate", async (message) => {
   if(message.author.bot){
     return;
   }
-  if(config.banned.includes(message.author.id)){
+  if(config.banned.includes){
     return;
   }
   if(!message.content.startsWith(prefix)){
