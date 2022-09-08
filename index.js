@@ -42,39 +42,6 @@ require("./events/ready.js")
 // SLASH COMMAND DESCRIPTIONS
 const slashCommands = [
   {
-    name: "blep",
-    type: 1,
-    description: "Send a random adorable animal photo",
-    options: [
-        {
-            name: "animal",
-            description: "The type of animal",
-            type: 3,
-            required: true,
-            choices: [
-                {
-                    name: "Dog",
-                    value: "animal_dog"
-                },
-                {
-                    name: "Cat",
-                    value: "animal_cat"
-                },
-                {
-                    name: "Penguin",
-                    value: "animal_penguin"
-                }
-            ]
-        },
-        {
-            name: "only_smol",
-            description: "Whether to show only baby animals",
-            type: 5,
-            required: false
-        }
-    ]
-  },
-  {
     name: "command-ban",
     description: "Command ban to user",
     options: [{
@@ -96,6 +63,22 @@ const slashCommands = [
         required: true
       }
     ]
+  },
+  {
+    name: "ban",
+    description: "Ban to user",
+    options: [{
+        name: "user",
+        description: "User to ban",
+        type: 6,
+        required: true
+      },
+      {
+        name: "reason",
+        description: "Reason to ban",
+        type: 3,
+        required: true
+      }]
   }
 ];
 
@@ -104,6 +87,7 @@ const slashCommands = [
   try {
     console.log('Started refreshing application (/) commands.');
     await console.log(db.table("commandban"));
+    await console.log(db.table("banlog"));
     await rest.put(Routes.applicationCommands(config.clientid), { body: slashCommands });
     console.log('Successfully reloaded application (/) commands.');
   } catch (error) {
@@ -122,37 +106,82 @@ client.on('interactionCreate', async interaction => {
     return interaction.reply({ content: "You are banned from using slash commands.", ephemeral: true });
   }
 
-  if(interaction.commandName === 'blep'){
-      await interaction.reply('Blep! :3');
+  if(interaction.commandName === 'ban'){
+    if(interaction.member.permissions.has("BAN_MEMBERS")) {
+      const user = interaction.options.getUser('user');
+      const reason = user.tag + " - " + interaction.options.getString('reason') + " - " + interaction.user.id + " - " + interaction.user.tag;
+      const member = interaction.guild.members.cache.get(user.id);
+      if(member == interaction.member) {
+        return await interaction.reply({ content: "You can't ban yourself.", ephemeral: true });
+      }
+      if(member == interaction.guild.fetchOwner()) {
+        return await interaction.reply({ content: "You can't ban server owner.", ephemeral: true });
+      }
+      if(member == client.user) {
+        return await interaction.reply({ content: "You can't ban me.", ephemeral: true });
+      }
+      if(member == config.ownerid) {
+        return await interaction.reply({ content: "You can't ban my owner.", ephemeral: true });
+      }
+      if(member == interaction.guild.members.cache.get(config.clientid)) {
+        return await interaction.reply({ content: "You can't ban my client.", ephemeral: true });
+      }
+      if(member){
+        const guildbancountarray = await db.get(`banlog.${user}`);
+        var guildbancount = 0; 
+        if(guildbancountarray != null) {
+          guildbancountarray.forEach(async (ban) => {
+            guildbancount = guildbancount + 1;
+          });
+        }
+        await db.push(`banlog.${user}`, {ban: `Banned by <@${interaction.user.id}>`, reason, guildbancount: guildbancount + 1});
+        await member.ban({ reason: reason });
+        await interaction.reply({ content: `**${user.tag}** banned from server.`, ephemeral: true });
+        console.log(`` + user.tag + ` banned from ` + interaction.guild.name + ` by ` + interaction.user.tag + ``);
+      }else{
+        await interaction.reply({ content: `<@${user.id}> not on server`, ephemeral: true });
+      }
+    }else{
+      await interaction.reply({ content: "You don't have permission to use this command.", ephemeral: true });
+    }
   }
   if(interaction.commandName === 'command-ban'){
-    if(interaction.user.id != config.ownerid){
-      await interaction.reply({content: "You are not owner of this bot!", ephemeral: true});
-    }else{
-      if(interaction.options.getMember('user').user.id != null){
-        const user = interaction.options.getMember('user').user.id;
-        var bancounter = await db.get(`commandban.${user}.bancounter`);
-        if(bancounter == null){
-          bancounter = 1;
-        }
-        const banned = await db.get(`commandban.${user}.banunban`);
-        const reason = "\n" + bancounter + ") " + interaction.options.getString('reason');
-        const banunban = interaction.options.getBoolean('ban-unban');
-        console.log(banned);
-        if(banned == true){
-          if(banunban == true){
-            await db.set(`commandban.${user}.reason`, await db.get(`commandban.${user}.reason`) + " " + reason);
-            await interaction.reply({content: `<@${interaction.options.getMember('user').user.id}> already banned! \nReasons: ${await db.get(`commandban.${user}.reason`)}`, ephemeral: true});
-          }else{
-            await db.set(`commandban.${user}.banunban`, false);
-            await interaction.reply({content : `<@${interaction.options.getMember('user').user.id}> unbanned!`, ephemeral : true});
-          }
+    const intuser = interaction.user.id;
+    if(intuser != config.ownerid){
+      return await interaction.reply({content: "You are not owner of this bot!", ephemeral: true});
+    }
+    if(interaction.options.getMember('user').user.id != null){
+      const user = interaction.options.getMember('user').user.id;
+      var bancounter = 0;
+      const banned = await db.get(`commandban.${user}`);
+      if(banned) {
+        banned.forEach(async (ban) => {
+          bancounter = bancounter + 1;
+        });
+      }
+      const reason = interaction.options.getString('reason') + " - " + interaction.user.id + " - " + interaction.user.tag;
+      const banunban = interaction.options.getBoolean('ban-unban');
+      if(bancounter % 2 == 1){
+        if(banunban == true){
+          console.log(`` + interaction.user.tag + ` tried to ban ` + user + ` but already banned.`);
+          return await interaction.reply({content: "User is already banned from using slash commands!", ephemeral: true});
         }else{
-          await db.set(`commandban.${user}`, {banunban, reason, bancounter: bancounter + 1});
-          await interaction.reply({content : `<@${interaction.options.getMember('user').user.id}> banned`, ephemeral : true});
+          await db.push(`commandban.${user}`, { reason: reason, bancounter: bancounter + 1});
+          await interaction.reply({content: "User unbanned from using slash commands!", ephemeral: true});
+          console.log(`` + interaction.options.getMember('user').user.tag + ` unbanned from using slash commands by ` + interaction.user.tag + ``);
+        }
+      }else{
+        if(banunban == true){
+          await db.push(`commandban.${user}`, { reason: reason, bancounter: bancounter + 1});
+          await interaction.reply({content: "User banned from using slash commands!", ephemeral: true});
+          console.log(`` + interaction.options.getMember('user').user.tag + ` banned from using slash commands by ` + interaction.user.tag + ``);
+        }else{
+          console.log(`` + interaction.user.tag + ` tried to unban ` + user + ` but not banned.`);
+          return await interaction.reply({content: "User is not banned from using slash commands!", ephemeral: true});
         }
       }
     }
+    
     
   }
   /*
