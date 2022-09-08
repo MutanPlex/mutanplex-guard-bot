@@ -20,9 +20,15 @@
     │   │     │
     │   │     └──Reason
     │   │
-    │   └──unban (Unban from server)
+    │   ├──unban (Unban from server)
+    │   │  │
+    │   │  └──User Id
+    │   │
+    │   └──kick (Kick user from server (Database Log))
     │      │
-    │      └──User Id
+    │      └──User mention
+    │         │
+    │         └──Reason
     │
     │
     └──Default Commands

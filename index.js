@@ -89,7 +89,23 @@ const slashCommands = [
         type: 3,
         required: true
       }]
-  }
+  },
+  {
+    name: "kick",
+    description: "Kick to user",
+    options: [{
+        name: "user",
+        description: "Kick to user",
+        type: 6,
+        required: true
+      },
+      {
+        name: "reason",
+        description: "Reason to kick",
+        type: 3,
+        required: true
+      }]
+  },
 ];
 
 // REGISTER SLASH COMMANDS
@@ -98,6 +114,7 @@ const slashCommands = [
     console.log('Started refreshing application (/) commands.');
     await console.log(db.table("commandban"));
     await console.log(db.table("banlog"));
+    await console.log(db.table("kicklog"));
     await rest.put(Routes.applicationCommands(config.clientid), { body: slashCommands });
     console.log('Successfully reloaded application (/) commands.');
   } catch (error) {
@@ -155,7 +172,7 @@ client.on('interactionCreate', async interaction => {
       await interaction.reply({ content: "You don't have permission to use this command.", ephemeral: true });
     }
   }
-  if(interaction.commandName == 'unban'){
+  if(interaction.commandName === 'unban'){
     
     if(interaction.member.permissions.has("BAN_MEMBERS")) {
       const userx = interaction.options.getString('user');
@@ -208,6 +225,45 @@ client.on('interactionCreate', async interaction => {
     }
     
     
+  }
+  if(interaction.commandName === 'kick'){
+    if(interaction.member.permissions.has("KICK_MEMBERS")) {
+      const user = interaction.options.getUser('user');
+      const reason = user.tag + " - " + interaction.options.getString('reason') + " - " + interaction.user.id + " - " + interaction.user.tag;
+      const member = interaction.guild.members.cache.get(user.id);
+      if(member == interaction.member) {
+        return await interaction.reply({ content: "You can't kick yourself.", ephemeral: true });
+      }
+      if(member == interaction.guild.fetchOwner()) {
+        return await interaction.reply({ content: "You can't kick server owner.", ephemeral: true });
+      }
+      if(member == client.user) {
+        return await interaction.reply({ content: "You can't kick me.", ephemeral: true });
+      }
+      if(member == config.ownerid) {
+        return await interaction.reply({ content: "You can't kick my owner.", ephemeral: true });
+      }
+      if(member == interaction.guild.members.cache.get(config.clientid)) {
+        return await interaction.reply({ content: "You can't kick my client.", ephemeral: true });
+      }
+      if(member){
+        const guildkickcountarray = await db.get(`kicklog.${user}`);
+        var guildkickcount = 0; 
+        if(guildkickcountarray != null) {
+          guildkickcountarray.forEach(async (kick) => {
+            guildkickcount = guildkickcount + 1;
+          });
+        }
+        await db.push(`kicklog.${user}`, {kick: `Kicked by <@${interaction.user.id}>`, reason, guildkickcount: guildkickcount + 1});
+        await member.kick({ reason: reason });
+        await interaction.reply({ content: `**${user.tag}** kicked from server.`, ephemeral: true });
+        console.log(`` + user.tag + ` kicked from ` + interaction.guild.name + ` by ` + interaction.user.tag + ``);
+      }else{
+        await interaction.reply({ content: `<@${user.id}> not on server`, ephemeral: true });
+      }
+    }else{
+      await interaction.reply({ content: "You don't have permission to use this command.", ephemeral: true });
+    }
   }
   /*
     only user see this message 
