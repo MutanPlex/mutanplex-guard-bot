@@ -6,15 +6,21 @@
     │
     ├──Slash Commands
     │   │
-    │   ├──Ban users from slash commands (Slash Command & Database)
+    │   ├──command-ban (Ban users from slash commands (Database Log))
+    │   │  │
+    │   │  └──User mention
+    │   │     │
+    │   │     └──True or False
+    │   │        │ 
+    │   │        └──Reason
     │   │
-    │   ├──Ban Command (Slash Command & Database)
+    │   ├──ban (Ban user from server (Database Log))
     │   │  │
     │   │  └──User mention
     │   │     │
     │   │     └──Reason
     │   │
-    │   └──Unban command (Slash Command)
+    │   └──unban (Unban from server)
     │      │
     │      └──User Id
     │
