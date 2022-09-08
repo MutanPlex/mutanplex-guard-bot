@@ -38,14 +38,30 @@
     │   │        │
     │   │        └──Emoji
     │   │           
+    │   ├──removereactionrole (Remove reaction role (Database))
+    │   │  │
+    │   │  └──Message id
+    │   │     │
+    │   │     └──Role
+    │   │        │
+    │   │        └──Emoji
     │   │
-    │   └──removereactionrole (Remove reaction role (Database))
+    │   ├──reactionrolelist (Guild reaction role list (Database))
+    │   │           
+    │   ├──reactionroleclear (Guild reaction role list clear (Database))
+    │   │           
+    │   ├──addrole (User add role (Database Log))
+    │   │  │
+    │   │  └──Mention role
+    │   │           
+    │   ├──removerole (User remove role (Database Log))
+    │   │  │
+    │   │  └──User mention
+    │   │
+    │   └──rolelog (User added removed role log (Database Log))
     │      │
-    │      └──Message id
-    │         │
-    │         └──Role
-    │            │
-    │            └──Emoji
+    │      └──User mention
+    │
     │
     └──Default Commands
         │

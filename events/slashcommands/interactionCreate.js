@@ -197,4 +197,117 @@ client.on('interactionCreate', async interaction => {
         await interaction.reply({ content: `Missing arguments.`, ephemeral: true });
       }
     }
+    if(interaction.commandName === 'reactionrolelist'){
+      if(interaction.member == interaction.guild.fetchOwner()) {
+        return await interaction.reply({ content: "You don't have permission to use this command.", ephemeral: true });
+      }
+      const reactionrolearray = await db.get(`ticket.${interaction.guild.id}`);
+      var reactionrolelist = "";
+      if(reactionrolearray != null){
+        reactionrolearray.forEach(async (reactionrole) => {
+          if(reactionrole != null){
+            reactionrolelist = reactionrolelist + `Message: <#${reactionrole.message}>\nRole: <@&${reactionrole.role}>\nEmoji: ${reactionrole.emoji}\n\n`;
+          }
+        });
+      }
+      if(reactionrolelist == ""){
+        reactionrolelist = "No reaction roles found.";
+      }
+      await interaction.reply({ content: reactionrolelist, ephemeral: true });
+    }
+    if(interaction.commandName === 'reactionroleclear'){
+      if(interaction.member == interaction.guild.fetchOwner()) {
+        return await interaction.reply({ content: "You don't have permission to use this command.", ephemeral: true });
+      }
+      const reactionrolearray = await db.get(`ticket.${interaction.guild.id}`);
+      reactionrolearray.forEach(async (reactionrole) => {
+        if(reactionrole != null){
+          await db.delete(`ticket.${interaction.guild.id}`);
+        }
+      });
+      await interaction.reply({ content: `Reaction roles cleared.`, ephemeral: true });
+      console.log(`Reaction roles cleared by ` + interaction.user.tag + ``);
+    }
+    if(interaction.commandName === 'addrole'){
+      if(interaction.member.permissions.has("MANAGE_ROLES")) {
+        const user = interaction.options.getUser('user');
+        const role = interaction.options.getRole('role');
+        const member = interaction.guild.members.cache.get(user.id);
+        if(member == interaction.member) {
+          return await interaction.reply({ content: "You can't add role to yourself.", ephemeral: true });
+        }
+        if(member == interaction.guild.fetchOwner()) {
+          return await interaction.reply({ content: "You can't add role to server owner.", ephemeral: true });
+        }
+        if(member == client.user) {
+          return await interaction.reply({ content: "You can't add role to me.", ephemeral: true });
+        }
+        if(member == config.ownerid) {
+          return await interaction.reply({ content: "You can't add role to my owner.", ephemeral: true });
+        }
+        if(member == interaction.guild.members.cache.get(config.clientid)) {
+          return await interaction.reply({ content: "You can't add role to my client.", ephemeral: true });
+        }
+        if(member){
+          await member.roles.add(role);
+          await db.push(`rolelog.${user}`, {role: `Added role <@&${role.id}> by <@${interaction.user.id}>`});
+          await interaction.reply({ content: `**${role.name}** role added to **${user.tag}**.`, ephemeral: true });
+          console.log(`` + role.name + ` role added to ` + user.tag + ` by ` + interaction.user.tag + ``);
+        }else{
+          await interaction.reply({ content: `<@${user.id}> not on server`, ephemeral: true });
+        }
+      }else{
+        await interaction.reply({ content: "You don't have permission to use this command.", ephemeral: true });
+      }
+    }
+    if(interaction.commandName === 'removerole'){
+      if(interaction.member.permissions.has("MANAGE_ROLES")) {
+        const user = interaction.options.getUser('user');
+        const role = interaction.options.getRole('role');
+        const member = interaction.guild.members.cache.get(user.id);
+        if(member == interaction.member) {
+          return await interaction.reply({ content: "You can't remove role from yourself.", ephemeral: true });
+        }
+        if(member == interaction.guild.fetchOwner()) {
+          return await interaction.reply({ content: "You can't remove role from server owner.", ephemeral: true });
+        }
+        if(member == client.user) {
+          return await interaction.reply({ content: "You can't remove role from me.", ephemeral: true });
+        }
+        if(member == config.ownerid) {
+          return await interaction.reply({ content: "You can't remove role from my owner.", ephemeral: true });
+        }
+        if(member == interaction.guild.members.cache.get(config.clientid)) {
+          return await interaction.reply({ content: "You can't remove role from my client.", ephemeral: true });
+        }
+        if(member){
+          await member.roles.remove(role);
+          await db.push(`rolelog.${user}`, {role: `Removed role <@&${role.id}> by <@${interaction.user.id}>`});
+          await interaction.reply({ content: `**${role.name}** role removed from **${user.tag}**.`, ephemeral: true });
+          console.log(`` + role.name + ` role removed from ` + user.tag + ` by ` + interaction.user.tag + ``);
+        }else{
+          await interaction.reply({ content: `<@${user.id}> not on server`, ephemeral: true });
+        }
+      }else{
+        await interaction.reply({ content: "You don't have permission to use this command.", ephemeral: true });
+      }
+    }
+    if(interaction.commandName === 'rolelog'){
+      if(interaction.member.permissions.has("MANAGE_ROLES")) {
+        const user = interaction.options.getString('user');
+        const member = interaction.guild.members.cache.get(user);
+        const rolelog = await db.get(`rolelog.${member}`);
+        if(rolelog){
+          var rolelogtext = '';
+          rolelog.forEach(async (role) => {
+            rolelogtext = rolelogtext + role.role + '\n';
+          });
+          await interaction.reply({ content: `**Role log for <@${member.id}>**: \n\n` + rolelogtext, ephemeral: true });
+        }else{
+          await interaction.reply({ content: `**Role log for <@${member.id}>**: \n\nNo role log found.`, ephemeral: true });
+        }
+      }else{
+        await interaction.reply({ content: "You don't have permission to use this command.", ephemeral: true });
+      }
+    }
   });

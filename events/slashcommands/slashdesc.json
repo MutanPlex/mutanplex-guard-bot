@@ -107,5 +107,55 @@
           "type" : 3,
           "required" : true
         }]
+    },
+    {
+      "name" : "reactionrolelist",
+      "description" : "Reaction role list"
+    },
+    {
+      "name" : "reactionroleclear",
+      "description" : "Reaction role clear"
+    },
+    {
+      "name" : "addrole",
+      "description" : "Add role to user",
+      "options" : [{
+          "name" : "user",
+          "description" : "User to add role",
+          "type" : 6,
+          "required" : true
+        },
+        {
+          "name" : "role",
+          "description" : "Role to add",
+          "type" : 8,
+          "required" : true
+        }]
+    },
+    {
+      "name" : "removerole",
+      "description" : "Remove role to user",
+      "options" : [{
+          "name" : "user",
+          "description" : "User to remove role",
+          "type" : 6,
+          "required" : true
+        },
+        {
+          "name" : "role",
+          "description" : "Role to remove",
+          "type" : 8,
+          "required" : true
+        }]
+    },
+    {
+      "name" : "rolelog",
+      "description" : "User role log",
+      "options" : [{
+          "name" : "user",
+          "description" : "User to role log",
+          "type" : 3,
+          "required" : true
+        }]
     }
 ]
