@@ -79,6 +79,16 @@ const slashCommands = [
         type: 3,
         required: true
       }]
+  },
+  {
+    name: "unban",
+    description: "Unban to user",
+    options: [{
+        name: "user",
+        description: "User to unban",
+        type: 3,
+        required: true
+      }]
   }
 ];
 
@@ -140,6 +150,21 @@ client.on('interactionCreate', async interaction => {
         console.log(`` + user.tag + ` banned from ` + interaction.guild.name + ` by ` + interaction.user.tag + ``);
       }else{
         await interaction.reply({ content: `<@${user.id}> not on server`, ephemeral: true });
+      }
+    }else{
+      await interaction.reply({ content: "You don't have permission to use this command.", ephemeral: true });
+    }
+  }
+  if(interaction.commandName == 'unban'){
+    
+    if(interaction.member.permissions.has("BAN_MEMBERS")) {
+      const userx = interaction.options.getString('user');
+      try {
+        let user = await interaction.guild.members.unban(userx);
+        await interaction.reply({ content: `**${user}** unbanned from server.`, ephemeral: true });
+        console.log(`` + user + ` unbanned from ` + interaction.guild.name + ` by ` + interaction.user.tag + ``);
+      } catch (error) {
+        await interaction.reply({ content: `**<@${userx}>** not banned from server.`, ephemeral: true });
       }
     }else{
       await interaction.reply({ content: "You don't have permission to use this command.", ephemeral: true });
