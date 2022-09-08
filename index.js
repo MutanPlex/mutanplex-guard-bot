@@ -40,73 +40,7 @@ require("./events/message.js")
 require("./events/ready.js")
 
 // SLASH COMMAND DESCRIPTIONS
-const slashCommands = [
-  {
-    name: "command-ban",
-    description: "Command ban to user",
-    options: [{
-        name: "user",
-        description: "User to ban",
-        type: 6,
-        required: true
-      },
-      {
-        name: "ban-unban",
-        description: "Ban or unban",
-        type: 5,
-        required: true,
-      },
-      {
-        name: "reason",
-        description: "Reason to ban",
-        type: 3,
-        required: true
-      }
-    ]
-  },
-  {
-    name: "ban",
-    description: "Ban to user",
-    options: [{
-        name: "user",
-        description: "User to ban",
-        type: 6,
-        required: true
-      },
-      {
-        name: "reason",
-        description: "Reason to ban",
-        type: 3,
-        required: true
-      }]
-  },
-  {
-    name: "unban",
-    description: "Unban to user",
-    options: [{
-        name: "user",
-        description: "User to unban",
-        type: 3,
-        required: true
-      }]
-  },
-  {
-    name: "kick",
-    description: "Kick to user",
-    options: [{
-        name: "user",
-        description: "Kick to user",
-        type: 6,
-        required: true
-      },
-      {
-        name: "reason",
-        description: "Reason to kick",
-        type: 3,
-        required: true
-      }]
-  },
-];
+const slashCommands = require("./slashdesc.json");
 
 // REGISTER SLASH COMMANDS
 (async () => {
