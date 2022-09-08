@@ -63,5 +63,49 @@
           "type": 3,
           "required": true
         }]
+    },
+    {
+      "name" : "reactionrole",
+      "description" : "Reaction role",
+      "options" : [{
+          "name" : "message",
+          "description" : "Message to reaction role",
+          "type" : 3,
+          "required" : true
+        },
+        {
+          "name" : "role",
+          "description" : "Role to reaction role",
+          "type" : 8,
+          "required" : true
+        },
+        {
+          "name" : "emoji",
+          "description" : "Emoji to reaction role",
+          "type" : 3,
+          "required" : true
+        }]
+    },
+    {
+      "name" : "removereactionrole",
+      "description" : "Reaction role remove",
+      "options" : [{
+          "name" : "message",
+          "description" : "Message to remove reaction role",
+          "type" : 3,
+          "required" : true
+        },
+        {
+          "name" : "role",
+          "description" : "Role to reaction role",
+          "type" : 8,
+          "required" : true
+        },
+        {
+          "name" : "emoji",
+          "description" : "Emoji to reaction role",
+          "type" : 3,
+          "required" : true
+        }]
     }
 ]

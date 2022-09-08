@@ -49,6 +49,7 @@ const slashCommands = require("./slashdesc.json");
     await console.log(db.table("commandban"));
     await console.log(db.table("banlog"));
     await console.log(db.table("kicklog"));
+    await console.log(db.table("ticket"));
     await rest.put(Routes.applicationCommands(config.clientid), { body: slashCommands });
     console.log('Successfully reloaded application (/) commands.');
   } catch (error) {
@@ -199,10 +200,120 @@ client.on('interactionCreate', async interaction => {
       await interaction.reply({ content: "You don't have permission to use this command.", ephemeral: true });
     }
   }
-  /*
-    only user see this message 
-    await interaction.reply({content : 'Running command ban command', ephemeral : true});
-  */
+  if(interaction.commandName === 'reactionrole'){
+    if(interaction.member == interaction.guild.fetchOwner()) {
+      return await interaction.reply({ content: "You don't have permission to use this command.", ephemeral: true });
+    }
+    const message = interaction.options.getString('message');
+    const role = interaction.options.getRole('role');
+    const emoji = interaction.options.getString('emoji');
+    if(message && role && emoji){
+      const msg = await interaction.channel.messages.fetch(message);
+      if(msg){
+        await msg.react(emoji);
+        await db.push(`ticket.${interaction.guild.id}`, { message ,role: role.id, emoji: emoji });
+        await interaction.reply({ content: `Reaction role added to message.`, ephemeral: true });
+        console.log(`Reaction role added to message by ` + interaction.user.tag + ``);
+      }else{
+        await interaction.reply({ content: `Message not found.`, ephemeral: true });
+      }
+    }else{
+      await interaction.reply({ content: `Missing arguments.`, ephemeral: true });
+    }
+  }
+  if(interaction.commandName === 'removereactionrole'){
+    if(interaction.member == interaction.guild.fetchOwner()) {
+      return await interaction.reply({ content: "You don't have permission to use this command.", ephemeral: true });
+    }
+    const message = interaction.options.getString('message');
+    const role = interaction.options.getRole('role');
+    const emoji = interaction.options.getString('emoji');
+    var counter = 0;
+    if(message && role && emoji){
+      const msg = await interaction.channel.messages.fetch(message);
+      const reactionrolearray = await db.get(`ticket.${interaction.guild.id}`);
+      reactionrolearray.forEach(async (reactionrole) => {
+        if(reactionrole != null){
+          if(reactionrole.message == message && reactionrole.role == role.id && reactionrole.emoji == emoji){
+            return;
+          }
+        }
+        counter = counter + 1;
+      });
+      if(msg){
+        await db.delete(`ticket.${interaction.guild.id}[${counter}]`);
+        await interaction.reply({ content: `Reaction role removed from message.`, ephemeral: true });
+        console.log(`Reaction role removed from message by ` + interaction.user.tag + ``);
+      }else{
+        await interaction.reply({ content: `Message not found.`, ephemeral: true });
+      }
+    }else{
+      await interaction.reply({ content: `Missing arguments.`, ephemeral: true });
+    }
+  }
+});
+
+client.on('messageReactionAdd', async (reaction, user) => {
+	if (reaction.partial) {
+		try {
+			await reaction.fetch();
+		} catch (error) {
+			console.error('Something went wrong when fetching the message:', error);
+			return;
+		}
+	}
+  var reactionmsg = ` `;
+  var reactionrole = ` `;
+  var reactionemoji = ` `;
+  const reactionrolearray = await db.get(`ticket.${reaction.message.guild.id}`);
+  if(reactionrolearray != null){
+    reactionrolearray.forEach(async (reactionx) => {
+      if(reactionx == null) return;
+      if(reactionx.message == reaction.message.id){
+        reactionmsg = reactionx.message;
+        reactionrole = reactionx.role;
+        reactionemoji = reactionx.emoji;
+      }
+    });
+    if(reaction.message.id == reactionmsg){
+      if(reaction.emoji.name == reactionemoji){
+        const member = reaction.message.guild.members.cache.get(user.id);
+        const role = reaction.message.guild.roles.cache.get(reactionrole);
+        member.roles.add(role);
+      }
+    }
+  }
+});
+client.on('messageReactionRemove', async (reaction, user) => {
+  if (reaction.partial) {
+    try {
+      await reaction.fetch();
+    } catch (error) {
+      console.error('Something went wrong when fetching the message:', error);
+      return;
+    }
+  }
+  var reactionmsg = ` `;
+  var reactionrole = ` `;
+  var reactionemoji = ` `;
+  const reactionrolearray = await db.get(`ticket.${reaction.message.guild.id}`);
+  if(reactionrolearray != null){
+    reactionrolearray.forEach(async (reactionx) => {
+      if(reactionx == null) return;
+      if(reactionx.message == reaction.message.id){
+        reactionmsg = reactionx.message;
+        reactionrole = reactionx.role;
+        reactionemoji = reactionx.emoji;
+      }
+    });
+    if(reaction.message.id == reactionmsg){
+      if(reaction.emoji.name == reactionemoji){
+        const member = reaction.message.guild.members.cache.get(user.id);
+        const role = reaction.message.guild.roles.cache.get(reactionrole);
+        member.roles.remove(role);
+      }
+    }
+  }
 });
 
 client.login(config.token).catch(e => {

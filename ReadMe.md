@@ -24,12 +24,28 @@
     │   │  │
     │   │  └──User Id
     │   │
-    │   └──kick (Kick user from server (Database Log))
+    │   ├──kick (Kick user from server (Database Log))
+    │   │  │
+    │   │  └──User mention
+    │   │     │
+    │   │     └──Reason
+    │   │
+    │   ├──reactionrole (Add Reaction role (Database))
+    │   │  │
+    │   │  └──Message id
+    │   │     │
+    │   │     └──Role
+    │   │        │
+    │   │        └──Emoji
+    │   │           
+    │   │
+    │   └──removereactionrole (Remove reaction role (Database))
     │      │
-    │      └──User mention
+    │      └──Message id
     │         │
-    │         └──Reason
-    │
+    │         └──Role
+    │            │
+    │            └──Emoji
     │
     └──Default Commands
         │
