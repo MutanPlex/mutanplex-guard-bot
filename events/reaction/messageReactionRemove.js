@@ -16,7 +16,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
     var reactionmsg = ` `;
     var reactionrole = ` `;
     var reactionemoji = ` `;
-    const reactionrolearray = await db.get(`ticket.${reaction.message.guild.id}`);
+    const reactionrolearray = await db.get(`reactionrole.${reaction.message.guild.id}`);
     if(reactionrolearray != null){
       reactionrolearray.forEach(async (reactionx) => {
         if(reactionx == null) return;

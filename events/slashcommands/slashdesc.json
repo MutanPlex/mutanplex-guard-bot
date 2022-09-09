@@ -157,5 +157,83 @@
           "type" : 3,
           "required" : true
         }]
+    },
+    {
+      "name" : "voicemute",
+      "description" : "Voice mute to user",
+      "options" : [{
+          "name" : "user",
+          "description" : "User to voice mute",
+          "type" : 6,
+          "required" : true
+        },
+        {
+          "name" : "reason",
+          "description" : "Reason to voice mute",
+          "type" : 3,
+          "required" : true
+        }]
+    },
+    {
+      "name" : "voiceunmute",
+      "description" : "Voice unmute to user",
+      "options" : [{
+          "name" : "user",
+          "description" : "User to voice unmute",
+          "type" : 6,
+          "required" : true
+        },
+        {
+          "name" : "reason",
+          "description" : "Reason to voice unmute",
+          "type" : 3,
+          "required" : true
+        }]
+    },
+    {
+      "name" : "voicekick",
+      "description" : "Voice kick to user",
+      "options" : [{
+          "name" : "user",
+          "description" : "User to voice kick",
+          "type" : 6,
+          "required" : true
+        }]
+    },
+    {
+      "name" : "voicelog",
+      "description" : "User voice log",
+      "options" : [{
+          "name" : "user",
+          "description" : "User to voice log",
+          "type" : 3,
+          "required" : true
+        }]
+    },
+    {
+      "name" : "voicemoveall",
+      "description" : "Voice move all to channel",
+      "options" : [{
+          "name" : "channel",
+          "description" : "Channel to voice move all",
+          "type" : 7,
+          "required" : true
+        }]
+    },
+    {
+      "name" : "voicemove",
+      "description" : "Voice move to channel",
+      "options" : [{
+          "name" : "user",
+          "description" : "User to voice move",
+          "type" : 6,
+          "required" : true
+        },
+        {
+          "name" : "channel",
+          "description" : "Channel to voice move",
+          "type" : 7,
+          "required" : true
+        }]
     }
 ]

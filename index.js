@@ -50,7 +50,9 @@ const slashCommands = require("./events/slashcommands/slashdesc.json");
     await console.log(db.table("commandban"));
     await console.log(db.table("banlog"));
     await console.log(db.table("kicklog"));
-    await console.log(db.table("ticket"));
+    await console.log(db.table("reactionrole"));
+    await console.log(db.table("rolelog"));
+    await console.log(db.table("voicelog"));
     await rest.put(Routes.applicationCommands(config.clientid), { body: slashCommands });
     console.log('Successfully reloaded application (/) commands.');
   } catch (error) {

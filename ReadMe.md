@@ -58,9 +58,39 @@
     │   │  │
     │   │  └──User mention
     │   │
-    │   └──rolelog (User added removed role log (Database Log))
+    │   ├──rolelog (User added removed role log (Database Log))
+    │   │  │
+    │   │  └──User id
+    │   │
+    │   ├──voicemute (Voice mute (Database Log))
+    │   │  │
+    │   │  └──User mention
+    │   │     │
+    │   │     └──Reason
+    │   │
+    │   ├──voiceunmute (Voice unmute (Database Log))
+    │   │  │
+    │   │  └──User mention
+    │   │     │
+    │   │     └──Reason
+    │   │
+    │   ├──voicekick (Voice kick (Database Log))
+    │   │  │
+    │   │  └──User mention
+    │   │
+    │   ├──voicelog (User mute log (Database Log))
+    │   │  │
+    │   │  └──User id
+    │   │
+    │   ├──voicemoveall (Moves people on your channel (Database Log))
+    │   │  │
+    │   │  └──Channel mention
+    │   │
+    │   └──voicemove (Moves the mentioned user (Database Log))
     │      │
     │      └──User mention
+    │         │
+    │         └──Channel mention
     │
     │
     └──Default Commands
